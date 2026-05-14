@@ -1,33 +1,46 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function Login({ setIsLoggedIn, setShowRegister }) {
+export default function Register({ setIsLoggedIn, setShowRegister }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5001/api/auth/login",
+        "http://localhost:5001/api/auth/register",
         {
+          name,
           email,
           password,
         }
       );
 
-      // SAVE TOKEN + USER
-      localStorage.setItem("token", res.data.token);
+      alert("User registered successfully");
+
+      // optional auto-login data save
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      setIsLoggedIn(true);
+      // 🔥 GO BACK TO LOGIN PAGE AFTER SUCCESS
+      setShowRegister(false);
+
     } catch (err) {
-      console.log(err.response?.data?.message || "Login error");
+      console.log(err.response?.data?.message || "Register error");
     }
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
+      <h2>Register</h2>
+
+      <input
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <br /><br />
 
       <input
         placeholder="Email"
@@ -35,8 +48,7 @@ export default function Login({ setIsLoggedIn, setShowRegister }) {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         placeholder="Password"
@@ -45,14 +57,13 @@ export default function Login({ setIsLoggedIn, setShowRegister }) {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button onClick={handleLogin}>
-        Login
+      <button onClick={handleRegister}>
+        Sign Up
       </button>
 
-      {/* SIGNUP LINK */}
+      {/* 🔥 THIS ALSO GOES TO LOGIN PAGE */}
       <p
         style={{
           marginTop: "15px",
@@ -60,9 +71,9 @@ export default function Login({ setIsLoggedIn, setShowRegister }) {
           cursor: "pointer",
           textDecoration: "underline",
         }}
-        onClick={() => setShowRegister(true)}
+        onClick={() => setShowRegister(false)}
       >
-        Don't have an account? Sign up
+        Already have an account? Login
       </p>
     </div>
   );
