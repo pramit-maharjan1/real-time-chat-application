@@ -2,6 +2,7 @@ import { useState } from "react";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(

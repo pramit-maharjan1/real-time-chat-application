@@ -1,12 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function Register({ setIsLoggedIn, setShowRegister }) {
+export default function Register({ setShowRegister }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleRegister = async () => {
+    setError("");
     try {
       const res = await axios.post(
         "http://localhost:5001/api/auth/register",
@@ -17,63 +19,77 @@ export default function Register({ setIsLoggedIn, setShowRegister }) {
         }
       );
 
-      alert("User registered successfully");
-
       // optional auto-login data save
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // 🔥 GO BACK TO LOGIN PAGE AFTER SUCCESS
+      // GO BACK TO LOGIN PAGE AFTER SUCCESS
       setShowRegister(false);
-
     } catch (err) {
-      console.log(err.response?.data?.message || "Register error");
+      setError(err.response?.data?.message || "Registration failed. Please try again.");
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleRegister();
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Register</h2>
+    <div className="auth-container">
+      <h2 className="auth-title">Create account</h2>
+      <p className="auth-subtitle">Get started with Real Time Chat</p>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+      {error && <div className="auth-error">{error}</div>}
 
-      <br /><br />
+      <div className="auth-form">
+        <div className="auth-input-group">
+          <label htmlFor="register-name">Name</label>
+          <input
+            id="register-name"
+            className="auth-input"
+            type="text"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="auth-input-group">
+          <label htmlFor="register-email">Email</label>
+          <input
+            id="register-email"
+            className="auth-input"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-      <br /><br />
+        <div className="auth-input-group">
+          <label htmlFor="register-password">Password</label>
+          <input
+            id="register-password"
+            className="auth-input"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <button className="auth-button" onClick={handleRegister}>
+          Sign Up
+        </button>
+      </div>
 
-      <br /><br />
-
-      <button onClick={handleRegister}>
-        Sign Up
-      </button>
-
-      {/* 🔥 THIS ALSO GOES TO LOGIN PAGE */}
-      <p
-        style={{
-          marginTop: "15px",
-          color: "blue",
-          cursor: "pointer",
-          textDecoration: "underline",
-        }}
-        onClick={() => setShowRegister(false)}
-      >
-        Already have an account? Login
+      <p className="auth-footer">
+        Already have an account?{" "}
+        <span className="auth-link" onClick={() => setShowRegister(false)}>
+          Login
+        </span>
       </p>
     </div>
   );

@@ -75,7 +75,6 @@ export default function Chat() {
 
   // SEND MESSAGE
   const sendMessage = () => {
-
     if (!message.trim()) return;
 
     const data = {
@@ -88,68 +87,83 @@ export default function Chat() {
     setMessage("");
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
   return (
     <div className="chat-container">
-
-      <div className="chat-title">
-
+      <div className="chat-header">
         <h2>Chat App</h2>
-
-        <button onClick={logout}>
+        <button className="logout-button" onClick={logout}>
           Logout
         </button>
-
       </div>
 
       <div className="stats-box">
-        <p>Total Users: {stats.totalUsers}</p>
-        <p>Total Messages: {stats.totalMessages}</p>
+        <div className="stat-item">
+          Total Users <span className="stat-number">{stats.totalUsers}</span>
+        </div>
+        <div className="stat-item">
+          Total Messages{" "}
+          <span className="stat-number">{stats.totalMessages}</span>
+        </div>
       </div>
 
       <div className="message-box">
-
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={
-              msg.sender === user.name
-                ? "my-message"
-                : "other-message"
-            }
-          >
-            <div
-              className={`message ${
-                msg.sender === user.name
-                  ? "my-bubble"
-                  : "other-bubble"
-              }`}
-            >
-              <b>{msg.sender}</b>
-
-              <div>{msg.message}</div>
-
-            </div>
+        {messages.length === 0 ? (
+          <div className="empty-state">
+            No messages yet. Start the conversation!
           </div>
-        ))}
+        ) : (
+          messages.map((msg, i) => {
+            const isMine = msg.sender === user.name;
+            return (
+              <div
+                key={i}
+                className={`message-row ${
+                  isMine ? "my-message" : "other-message"
+                }`}
+              >
+                <div
+                  className={`message-bubble ${
+                    isMine ? "my-bubble" : "other-bubble"
+                  }`}
+                >
+                  {!isMine && (
+                    <div className="message-sender">{msg.sender}</div>
+                  )}
+                  <div>{msg.message}</div>
+                  <div className="message-time">
+                    {formatTime(msg.createdAt || msg.timestamp)}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
 
         <div ref={messagesEndRef}></div>
-
       </div>
 
       <div className="input-area">
-
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type message..."
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message..."
         />
-
-        <button onClick={sendMessage}>
-          Send
-        </button>
-
+        <button onClick={sendMessage}>Send</button>
       </div>
-
     </div>
   );
 }

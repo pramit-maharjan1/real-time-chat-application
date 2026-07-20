@@ -4,8 +4,10 @@ import axios from "axios";
 export default function Login({ setIsLoggedIn, setShowRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("");
     try {
       const res = await axios.post(
         "http://localhost:5001/api/auth/login",
@@ -21,48 +23,58 @@ export default function Login({ setIsLoggedIn, setShowRegister }) {
 
       setIsLoggedIn(true);
     } catch (err) {
-      console.log(err.response?.data?.message || "Login error");
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
+    <div className="auth-container">
+      <h2 className="auth-title">Welcome back</h2>
+      <p className="auth-subtitle">Sign in to continue chatting</p>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      {error && <div className="auth-error">{error}</div>}
 
-      <br />
-      <br />
+      <div className="auth-form">
+        <div className="auth-input-group">
+          <label htmlFor="login-email">Email</label>
+          <input
+            id="login-email"
+            className="auth-input"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <div className="auth-input-group">
+          <label htmlFor="login-password">Password</label>
+          <input
+            id="login-password"
+            className="auth-input"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-      <br />
-      <br />
+        <button className="auth-button" onClick={handleLogin}>
+          Login
+        </button>
+      </div>
 
-      <button onClick={handleLogin}>
-        Login
-      </button>
-
-      {/* SIGNUP LINK */}
-      <p
-        style={{
-          marginTop: "15px",
-          color: "blue",
-          cursor: "pointer",
-          textDecoration: "underline",
-        }}
-        onClick={() => setShowRegister(true)}
-      >
-        Don't have an account? Sign up
+      <p className="auth-footer">
+        Don't have an account?{" "}
+        <span className="auth-link" onClick={() => setShowRegister(true)}>
+          Sign up
+        </span>
       </p>
     </div>
   );
